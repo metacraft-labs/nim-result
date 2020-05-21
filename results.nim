@@ -245,11 +245,14 @@ type
     ## https://github.com/nim-lang/Nim/issues/8745 - genericReset slow
     ## https://github.com/nim-lang/Nim/issues/13879 - double-zero-init slow
 
-    case o: bool
+    case o*: bool
     of false:
-      e: E
+      e*: E
     of true:
-      v: T
+      # when T isnot void:
+      v*: T
+      # else:
+      #  d    iscard
 
 func raiseResultError[T, E](self: Result[T, E]) {.noreturn, noinline.} =
   # noinline because raising should take as little space as possible at call
@@ -306,7 +309,7 @@ template err*[T, E](self: var Result[T, E], x: auto) =
 template ok*(v: auto): auto = ok(typeof(result), v)
 template err*(v: auto): auto = err(typeof(result), v)
 
-template isOk*(self: Result): bool = self.o
+template isOk*[T, E](self: Result[T, E]): bool = self.o
 template isErr*(self: Result): bool = not self.o
 
 func map*[T, E, A](
